@@ -6,6 +6,8 @@ import org.apirest.libraryapi.model.repository.BookRepository;
 import org.apirest.libraryapi.service.BookService;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class BookServiceImpl implements BookService {
 
@@ -22,4 +24,20 @@ public class BookServiceImpl implements BookService {
         }
         return repository.save(book);
     }
+
+    @Override
+    public Optional<Book> getBookById(Long id) {
+        return this.repository.findById(id);
+    }
+
+    @Override
+    public void delete(Book book) {
+        repository.delete(book);
+    }
+
+    @Override
+    public Book update(Book book) {
+        return repository.save(book);
+    }
+
 }
