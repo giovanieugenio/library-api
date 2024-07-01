@@ -13,8 +13,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -71,4 +82,105 @@ public class BookServiceTest {
         Mockito.verify(repository, Mockito.never()).save(book);
     }
 
+    @Test
+    @DisplayName("Deve buscar um livro pelo id")
+    public void getBookByIdTest(){
+        Long id = 1L;
+        Book book = createValidBook();
+        book.setId(id);
+        Mockito.when(repository.findById(id)).thenReturn(Optional.of(book));
+
+        Optional<Book> findBook = service.getBookById(id);
+
+        Assertions.assertThat(findBook.isPresent()).isTrue();
+        Assertions.assertThat(findBook.get().getId()).isEqualTo(id);
+        Assertions.assertThat(findBook.get().getTitle()).isEqualTo(book.getTitle());
+        Assertions.assertThat(findBook.get().getAuthor()).isEqualTo(book.getAuthor());
+        Assertions.assertThat(findBook.get().getIsbn()).isEqualTo(book.getIsbn());
+    }
+
+    @Test
+    @DisplayName("Deve retornar 'recurso não econtrado' ao buscar um livro pelo id")
+    public void getBookNotFoundTest(){
+        Long id = 1L;
+        Book book = createValidBook();
+        book.setId(id);
+        Mockito.when(repository.findById(id)).thenReturn(Optional.empty());
+
+        Optional<Book> findBook = service.getBookById(id);
+
+        Assertions.assertThat(findBook.isPresent()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve deletar um livro pelo id na base de dados")
+    public void deleteBookByIdTest(){
+        Long id = 1L;
+        Book book = createValidBook();
+        book.setId(id);
+        Mockito.when(repository.findById(id)).thenReturn(Optional.of(book));
+
+        assertDoesNotThrow(()-> service.delete(book));
+
+        Mockito.verify(repository, Mockito.times(1)).delete(book);
+    }
+
+    @Test
+    @DisplayName("Deve retornar erro ao tentar deletar um livro na base de dados")
+    public void deleteInvalidBookTest(){
+        Book book = new Book();
+
+        assertThrows(IllegalArgumentException.class, ()-> service.delete(book));
+
+        Mockito.verify(repository, Mockito.never()).delete(book);
+    }
+
+    @Test
+    @DisplayName("Deve atualizar um livro na base de dados")
+    public void updateBookTest(){
+        Long id = 1L;
+        Book book = Book.builder().id(id).build();
+
+        Book updatedBook = createValidBook();
+        updatedBook.setId(id);
+        Mockito.when(repository.save(book)).thenReturn(updatedBook);
+
+        Book book2 = service.update(book);
+
+        Assertions.assertThat(book2.getId()).isEqualTo(updatedBook.getId());
+        Assertions.assertThat(book2.getTitle()).isEqualTo(updatedBook.getTitle());
+        Assertions.assertThat(book2.getAuthor()).isEqualTo(updatedBook.getAuthor());
+        Assertions.assertThat(book2.getIsbn()).isEqualTo(updatedBook.getIsbn());
+
+    }
+
+    @Test
+    @DisplayName("Deve retornar erro ao tentar atualizar um livro na base de dados")
+    public void updateInvalidBookTest(){
+        Book book = new Book();
+
+        assertThrows(IllegalArgumentException.class, ()-> service.update(book));
+
+        Mockito.verify(repository, Mockito.never()).delete(book);
+    }
+
+    @Test
+    @DisplayName("Deve filtrar um livro pela propriedade")
+    public void filterBookTest(){
+        Book book = createValidBook();
+
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        List<Book> list = Arrays.asList(book);
+        Page<Book> page = new PageImpl<>(list, pageRequest, 1);
+        Mockito.when(repository.findAll(Mockito.any(Example.class), Mockito.any(PageRequest.class))).thenReturn(page);
+
+        Page<Book> result = service.findByFilter(book, pageRequest);
+
+        Assertions.assertThat(result.getTotalElements()).isEqualTo(0);
+        Assertions.assertThat(result.getContent()).isEqualTo(list);
+        Assertions.assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
+        Assertions.assertThat(result.getPageable().getPageSize()).isEqualTo(10);
+
+    }
 }

@@ -7,6 +7,9 @@ import org.apirest.libraryapi.exception.BusinessException;
 import org.apirest.libraryapi.model.entity.Book;
 import org.apirest.libraryapi.service.BookService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -21,6 +24,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/books")
@@ -65,6 +71,15 @@ public class BookController {
         book.setTitle(dto.getTitle());
         book.setAuthor(dto.getAuthor());
         return modelMapper.map(bookService.update(book), BookDto.class);
+    }
+
+    @GetMapping
+    public Page<BookDto> findBookByFilter(BookDto dto, Pageable page){
+        Book filter = modelMapper.map(dto, Book.class);
+        Page<Book> result = bookService.findByFilter(filter, page);
+        List<BookDto> list = result.getContent().stream().map(
+                entity -> modelMapper.map(entity, BookDto.class)).collect(Collectors.toList());
+        return new PageImpl<>(list, page, result.getTotalElements());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

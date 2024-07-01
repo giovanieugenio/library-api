@@ -11,6 +11,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Optional;
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 @DataJpaTest
@@ -26,10 +28,25 @@ public class BookRepositoryTest {
     @DisplayName("Deve retornar verdadeiro quando encontrar 'isbn' na base de dados")
     public void returnTrueWhenFindIsbn(){
         String isbn = "4963";
-        entityManager.persist(Book.builder()
+        createNewBook(isbn);
+
+        boolean exists = repository.existsByIsbn(isbn);
+
+        Assertions.assertThat(exists).isTrue();
+    }
+
+    private Book createNewBook(String isbn) {
+        return entityManager.persist(Book.builder()
                 .title("As Crônicas de Nárnia")
                 .author("C.S Lewis")
                 .isbn(isbn).build());
+    }
+
+    @Test
+    @DisplayName("Deve retornar falso quando não encontrar 'isbn' na base de dados")
+    public void returnFalseWhenDoesntFindIsbn(){
+        String isbn = "";
+        entityManager.persist(createNewBook(isbn));
 
         boolean exists = repository.existsByIsbn(isbn);
 
@@ -37,16 +54,39 @@ public class BookRepositoryTest {
     }
 
     @Test
-    @DisplayName("Deve retornar falso quando não encontrar 'isbn' na base de dados")
-    public void returnFalseWhenDoesntFindIsbn(){
-        String isbn = "";
-        entityManager.persist(Book.builder()
-                .title("As Crônicas de Nárnia")
-                .author("C.S Lewis")
-                .isbn(isbn).build());
+    @DisplayName("Deve buscar um livro pelo id na base de dados")
+    public void findByIdTest(){
+        String isbn = "120";
+        Book book = createNewBook(isbn);
+        entityManager.persist(book);
 
-        boolean exists = repository.existsByIsbn(isbn);
+        Optional<Book> foundBook = repository.findById(book.getId());
 
-        Assertions.assertThat(exists).isTrue();
+        Assertions.assertThat(foundBook.isPresent()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Deve salvar um livro na base de dados")
+    public void saveBookTest(){
+        Book book = createNewBook("120");
+
+        Book bookSave = repository.save(book);
+
+        Assertions.assertThat(bookSave.getId()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Deve deletar um livro da base de dados")
+    public void deleteBookTest(){
+        Book book = createNewBook("120");
+        entityManager.persist(book);
+        Book foundBook = entityManager.find(Book.class, book.getId());
+
+        repository.delete(foundBook);
+
+        foundBook = entityManager.find(Book.class, book.getId());
+
+        Assertions.assertThat(foundBook).isNull();
+
     }
 }
