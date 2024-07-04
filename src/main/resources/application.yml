@@ -1,3 +1,21 @@
 spring:
   application:
     name: library-api
+  mail:
+    protocol: smtp
+    host: sandbox.smtp.mailtrap.io
+    port: 2525
+    username: eb1efc432e6cb0
+    password: 32bf492167aa87
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+        default-sender: mail@library-api.com
+
+application:
+  mail:
+    lateloans:
+      message: Atenção! Você está com empréstimo atrasado, favor verificar o cumprimento do prazo de entrega.

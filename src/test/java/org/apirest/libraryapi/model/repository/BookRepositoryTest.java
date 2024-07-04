@@ -19,7 +19,7 @@ import java.util.Optional;
 public class BookRepositoryTest {
 
     @Autowired
-    TestEntityManager entityManager;
+    static TestEntityManager entityManager;
 
     @Autowired
     BookRepository repository;
@@ -35,11 +35,12 @@ public class BookRepositoryTest {
         Assertions.assertThat(exists).isTrue();
     }
 
-    private Book createNewBook(String isbn) {
+    public static Book createNewBook(String isbn) {
         return entityManager.persist(Book.builder()
                 .title("As Crônicas de Nárnia")
                 .author("C.S Lewis")
-                .isbn(isbn).build());
+                .isbn(isbn)
+                .build());
     }
 
     @Test

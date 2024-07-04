@@ -19,4 +19,7 @@ public interface BookService {
     Book update(Book book);
 
     Page<Book> findByFilter(Book filter, Pageable page);
+
+    Optional<Book> getBookByIsbn(String isbn);
+
 }

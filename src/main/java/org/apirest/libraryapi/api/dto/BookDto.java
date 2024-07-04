@@ -1,4 +1,4 @@
-package org.apirest.libraryapi.api;
+package org.apirest.libraryapi.api.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;

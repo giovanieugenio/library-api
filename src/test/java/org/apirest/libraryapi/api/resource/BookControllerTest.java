@@ -2,7 +2,7 @@ package org.apirest.libraryapi.api.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.apirest.libraryapi.api.BookDto;
+import org.apirest.libraryapi.api.dto.BookDto;
 import org.apirest.libraryapi.exception.BusinessException;
 import org.apirest.libraryapi.model.entity.Book;
 import org.apirest.libraryapi.service.BookService;
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-@WebMvcTest
+@WebMvcTest(controllers = BookController.class)
 @AutoConfigureMockMvc
 public class BookControllerTest {
 
@@ -253,7 +252,7 @@ public class BookControllerTest {
 
     @SneakyThrows
     @Test
-    @DisplayName("Deve livros da base de dados")
+    @DisplayName("Deve filtrar livros da base de dados")
     public void findFilterBook() {
         Long id = 1L;
 
@@ -281,6 +280,4 @@ public class BookControllerTest {
                 .andExpect(jsonPath("pageable.pageSize").value(100))
                 .andExpect(jsonPath("pageable.pageNumber").value(0));
     }
-
-
 }

@@ -2,18 +2,18 @@ package org.apirest.libraryapi.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,21 +21,25 @@ import java.util.List;
 @Builder
 @Entity
 @Table
-public class Book {
+public class Loan {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
-    private String title;
+    private String customer;
+
+    @Column(name = "customer_email")
+    private String customerEmail;
+
+    @JoinColumn(name = "id_book")
+    @ManyToOne
+    private Book book;
 
     @Column
-    private String author;
+    private LocalDate loanDate;
 
     @Column
-    private String isbn;
-
-    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
-    private List<Loan> loans;
+    private Boolean returned;
 }
