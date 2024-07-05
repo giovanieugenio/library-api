@@ -6,6 +6,7 @@ import org.apirest.libraryapi.api.dto.BookDto;
 import org.apirest.libraryapi.exception.BusinessException;
 import org.apirest.libraryapi.model.entity.Book;
 import org.apirest.libraryapi.service.BookService;
+import org.apirest.libraryapi.service.LoanService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,6 +46,9 @@ public class BookControllerTest {
 
     @MockBean
     BookService bookService;
+
+    @MockBean
+    LoanService loanService;
 
     @SneakyThrows
     @Test

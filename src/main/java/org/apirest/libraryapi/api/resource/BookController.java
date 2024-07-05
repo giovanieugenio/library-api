@@ -66,7 +66,7 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public BookDto update(@PathVariable Long id, BookDto dto){
+    public BookDto update(@PathVariable Long id, @RequestBody @Valid BookDto dto){
         Book book = bookService.getBookById(id).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND));
         book.setTitle(dto.getTitle());
