@@ -1,6 +1,11 @@
 spring:
   application:
     name: library-api
+  boot:
+    admin:
+      client:
+        url: http://localhost:8081/
+
   mail:
     protocol: smtp
     host: sandbox.smtp.mailtrap.io
@@ -19,3 +24,20 @@ application:
   mail:
     lateloans:
       message: Atenção! Você está com empréstimo atrasado, favor verificar o cumprimento do prazo de entrega.
+
+springdoc:
+  swagger-ui:
+    path: /docs-park.html
+  api-docs:
+    path: /docs-park
+  packages-to-scan: org.apirest.libraryapi.api.resource
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+logging:
+  file:
+    name: appfile.log
+
